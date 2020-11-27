@@ -27,5 +27,6 @@ app.post('/email_post', function(req, res){
     console.log(req.body.email)
     // res.send("<h1> welcome !" + req.body.email + "</h1>")
     // res.send("post response")
+    //
     res.render('email.ejs', {'email' : req.body.email})
 })

@@ -2,6 +2,7 @@ var express = require('express')
 var app = express()
 var bodyParser = require('body-parser')
 var mysql = require('mysql')
+var main = require('./router/main')
 
 var connection = mysql.createConnection({
     host : 'localhost',
@@ -12,12 +13,12 @@ var connection = mysql.createConnection({
 
 connection.connect()
 
-connection.query('SELECT * FROM user', function(err, rows, fields){
-    if (err) throw err
-    console.log(rows[0])
-})
+// connection.query('SELECT * FROM user', function(err, rows, fields){
+//     if (err) throw err
+//     console.log(rows[0])
+// })
 
-connection.end()
+// connection.end()
 
 app.listen(3000, function(){
     console.log("start, express server on port 3000");
@@ -35,9 +36,12 @@ app.get('/', function(req,res){
     res.sendFile(__dirname + '/public/main.html')
 })
 
-app.get('/main', function(req,res){
-    res.sendFile(__dirname + '/public/main.html')
-})
+app.use('/main', main)
+
+
+// app.get('/main', function(req,res){
+//     res.sendFile(__dirname + '/public/main.html')
+// })
 
 app.post('/email_post', function(req, res){
     // get : req.params('email')
@@ -49,7 +53,20 @@ app.post('/email_post', function(req, res){
 })
 
 app.post('/ajax_send_email', function(req,res) {
-    console.log(req.body.email)
-    var responseData = {'result' : 'ok', 'email' : req.body.email}
-    res.json(responseData)
+    var email = req.body.email;
+    var responseData = {};
+    // var responseData = {'result' : 'ok', 'email' : req.body.email}
+
+    var query = connection.query('select name from user where email="' + email +'"', function(err, rows){
+        if(err) throw err;
+        if(rows[0]) {
+            console.log(rows[0].name)
+            // responseData.result = "ok";
+            // responseData.name = row[0].name;
+        } else{
+            console.log('none : ' + rows[0])
+        }
+    })
+
+    // res.json(responseData)
 });
